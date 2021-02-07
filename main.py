@@ -1,29 +1,46 @@
 import time
+import curses
+from typing import List, Type
 
-from model.model import Player, Game
+from model.bot import RandomBot, SimpleGreedyBot, BotInterface, NonDeterministicGreedyBot, BreadthFirstBot
+from model.game import Player, Game
 
-game = Game()
-print(game)
-print('=' * 66)
-player_1 = Player('A', game)
-print(game)
-print('=' * 66)
+stdscr = curses.initscr()
+stdscr.nodelay(True)
 
-player_2 = Player('B', game)
-print(game)
-print('=' * 66)
+game: Game = Game(width=64, height=32, apples=1000, walls=128)
+bots: List[BotInterface] = []
 
-player_3 = Player('C', game)
-print(game)
-print('=' * 66)
 
-game.spawn_apple()
-game.spawn_apple()
-game.spawn_apple()
-game.spawn_apple()
+def register_player(name: str, bot_class: Type[BotInterface]):
+    bots.append(bot_class(game.register(name)))
 
-while True:
+
+register_player('C', BreadthFirstBot)
+register_player('U', BreadthFirstBot)
+register_player('T', BreadthFirstBot)
+register_player('E', BreadthFirstBot)
+register_player('B', BreadthFirstBot)
+register_player('O', BreadthFirstBot)
+register_player('N', BreadthFirstBot)
+register_player('S', BreadthFirstBot)
+
+while game.running():
+    for bot in bots:
+        bot.solve()
+
+    player_moves = " || ".join(f"{p.name}: {p.move}" for p in game.players) + '\n'
+
     game.tick()
-    print(game)
-    print('=' * 66)
-    time.sleep(0.5)
+
+    stdscr.addstr(0, 0, player_moves)
+    stdscr.addstr(3, 0, str(game))
+
+    stdscr.refresh()
+
+    time.sleep(0.2)
+
+    if stdscr.getch() == 3:
+        break
+
+curses.endwin()
