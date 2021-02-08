@@ -113,15 +113,16 @@ class Game:
 
             if new_loc in self.apple_locs:
                 self.apple_locs.remove(new_loc)
-                # self._spawn_apple()
+                self._spawn_apple()
                 player.add_score()
 
     def contains_location(self, location: Location) -> bool:
         return 0 <= location.x < self.width and 0 <= location.y < self.height
     
     def running(self) -> bool:
-        # return not any(player.score > 200 for player in self.players)
-        return len(self.apple_locs) != 0
+        return not any(player.score > 20 for player in self.players)
+        # return len(self.apple_locs) != 0
+        # return True
 
     def _free_location(self) -> Location:
         while True:
@@ -148,7 +149,7 @@ class Game:
             board[apple_loc.y][apple_loc.x] = '*'
 
         for wall_loc in self.wall_locs:
-            board[wall_loc.y][wall_loc.x] = '□'
+            board[wall_loc.y][wall_loc.x] = '■'
 
         for player in self.players:
             board[player.location.y][player.location.x] = player.name
