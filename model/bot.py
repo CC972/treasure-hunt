@@ -3,16 +3,19 @@ from __future__ import annotations
 import random
 import time
 from collections import namedtuple
+from enum import Enum
 from typing import List, Optional, Set, FrozenSet, Tuple
 
+from algorithms.heuristics import Distance
 from model.game import Player, Direction, Location
 
 
 class BotInterface:
 
-    def __init__(self, player: Player):
+    def __init__(self, player: Player, distance: Distance):
         self.player = player
         self.game = player.game
+        self.distance = distance
         self.times = []
 
     def execute(self):
@@ -68,7 +71,7 @@ class SimpleGreedyBot(BotInterface):
         if self._apples_snapshot != self.game.apple_locs:
             self._apples_snapshot = frozenset(self.game.apple_locs)
             self._best_apple = min(self.game.apple_locs,
-                                   key=lambda loc: loc.distance(self.player.location),
+                                   key=lambda loc: self.distance(loc, self.player.location),
                                    default=None)
 
         return self._best_apple
@@ -78,7 +81,7 @@ class InefficientGreedyBot(SimpleGreedyBot):
 
     def _best_apple_loc(self) -> Location:
         return min(self.game.apple_locs,
-                   key=lambda loc: loc.distance(self.player.location),
+                   key=lambda loc: self.distance(loc, self.player.location),
                    default=None)
 
 
@@ -97,8 +100,8 @@ class BreadthFirstSearchBot(BotInterface):
             self.parent = parent
             self.location = location
 
-    def __init__(self, player: Player):
-        super().__init__(player)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self._apples_snapshot: FrozenSet[Location] = frozenset()
         self._instructions: List[Location] = []
 
@@ -161,8 +164,8 @@ class DepthFirstSearchBot(BotInterface):
             self.parent = parent
             self.location = location
 
-    def __init__(self, player: Player):
-        super().__init__(player)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self._apples_snapshot: FrozenSet[Location] = frozenset()
         self._instructions: List[Location] = []
 

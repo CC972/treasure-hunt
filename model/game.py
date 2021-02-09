@@ -26,9 +26,6 @@ class Location:
             return self.__key() == other.__key()
         return NotImplemented
 
-    def distance(self, other: Location) -> float:
-        return ((self.x - other.x) ** 2 + (self.y - other.y) ** 2) ** 0.5
-
 
 class Direction(Enum):
     UP = Location(0, -1)
@@ -118,11 +115,11 @@ class Game:
 
     def contains_location(self, location: Location) -> bool:
         return 0 <= location.x < self.width and 0 <= location.y < self.height
-    
+
     def running(self) -> bool:
-        return not any(player.score > 20 for player in self.players)
+        # return not any(player.score > 50 for player in self.players)
         # return len(self.apple_locs) != 0
-        # return True
+        return True
 
     def _free_location(self) -> Location:
         while True:
